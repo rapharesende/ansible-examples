@@ -1,0 +1,9 @@
+---
+- hosts: all
+  gather_facts: True
+  vars_prompt:
+
+  tasks:
+    - name: test connection
+      action:  ping
+      become: true
