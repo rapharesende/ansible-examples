@@ -1,0 +1,42 @@
+---
+- name: INSTALADOR SYSTEM CENTER
+  hosts: all
+  gather_facts: True
+  become: true
+  tasks:
+     - name: CREATE DIRECTORY
+       file:
+         path: /opt/sc
+         state: directory
+         mode: "u=rwx,g=wxx,o=rx"
+       become_method: sudo
+
+     - name: Ansible copy multiple files with_items
+       copy:
+         src: /etc/ansible/files/sc/{{item}}
+         dest: /opt/sc
+         mode: 0775
+       become_method: sudo
+       with_items:
+         ['ccm-Universalx64.tar','install']
+       when: ansible_architecture == "x86_64"
+
+     - name: Ansible copy multiple files with_items
+       copy:
+         src: /etc/ansible/files/sc/{{item}}
+         dest: /opt/sc
+         mode: 0775
+       become_method: sudo
+       with_items:
+         ['ccm-Universalx86.tar','install']
+       when: ansible_architecture == "i386"
+
+     - name: INSTALL SYSTEM CENTER 64 bits
+       command: /opt/sc/install -mp SP-SCCM-ST01.sp01.local -sitecode TVS /opt/sc/ccm-Universalx64.tar
+       become_method: sudo
+       when: ansible_architecture == "x86_64"
+
+     - name: INSTALL SYSTEM CENTER 32 bits
+       command: /opt/sc/install -mp SP-SCCM-ST01.sp01.local -sitecode TVS /opt/sc/ccm-Universalx86.tar
+       become_method: sudo
+       when: ansible_architecture == "i386"
